@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:udoo_erp/widgets/logo_widget.dart';
+import 'package:get/get.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -218,7 +219,9 @@ class _LoginScreenState extends State<LoginScreen> {
             borderRadius: BorderRadiusGeometry.circular(10),
           ),
         ),
-        onPressed: () {},
+        onPressed: () {
+          Get.toNamed('/home');
+        },
         child: Text(
           'Login',
           style: TextStyle(fontSize: 16, color: Colors.white),
