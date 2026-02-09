@@ -111,35 +111,75 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       child: Column(
         children: [
-          Row(
-            children: List.generate(tabs.length, (index) {
-              final selected = index == selectedIndex;
-              return Expanded(
-                child: Container(
-                  padding: EdgeInsets.symmetric(vertical: 10),
-                  decoration: BoxDecoration(
-                    color: selected ? Colors.white : Colors.transparent,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  alignment: Alignment.center,
-                  child: Text(
-                    tabs[index],
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      color: selected ? Colors.orange : Colors.grey,
-                    ),
-                  ),
-                ),
-              );
-            }),
+          DefaultTabController(
+            length: 4,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [_menuTabs, SizedBox(height: 16), _menuContent],
+            ),
           ),
-          SizedBox(height: 16),
+
+          // Row(
+          //   children: List.generate(tabs.length, (index) {
+          //     final selected = index == selectedIndex;
+          //     return Expanded(
+          //       child: Container(
+          //         padding: EdgeInsets.symmetric(vertical: 10),
+          //         decoration: BoxDecoration(
+          //           color: selected ? Colors.white : Colors.transparent,
+          //           borderRadius: BorderRadius.circular(8),
+          //         ),
+          //         alignment: Alignment.center,
+          //         child: Text(
+          //           tabs[index],
+          //           style: TextStyle(
+          //             fontWeight: FontWeight.w600,
+          //             color: selected ? Colors.orange : Colors.grey,
+          //           ),
+          //         ),
+          //       ),
+          //     );
+          //   }),
+          // ),
+          // SizedBox(height: 16),
+        ],
+      ),
+    );
+  }
+
+  Widget get _menuTabs {
+    return TabBar(
+      isScrollable: true,
+      labelColor: Colors.orange,
+      unselectedLabelColor: Colors.grey,
+      indicatorColor: Colors.orange,
+      indicatorWeight: 2,
+      indicatorSize: TabBarIndicatorSize.label,
+      labelStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+      tabs: [
+        Tab(text: 'Task'),
+        Tab(text: 'Approvals'),
+        Tab(text: 'Leave'),
+        Tab(text: 'KPI'),
+      ],
+    );
+  }
+
+  Widget get _menuContent {
+    return SizedBox(
+      height: 400,
+      child: TabBarView(
+        children: [
+          // _taskView
           TaskCard(
             title: 'KEY-06Title',
             progress: 10,
             start: '29-08-2025',
             due: '10-09-2025',
           ),
+          Center(child: Text('Approvals')),
+          Center(child: Text('Leave')),
+          Center(child: Text('KPI')),
         ],
       ),
     );
