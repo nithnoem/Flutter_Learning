@@ -95,10 +95,19 @@ class _HomeScreenState extends State<HomeScreen> {
     final selectedIndex = 0;
 
     return Container(
+      margin: EdgeInsets.only(left: 16, right: 16),
       padding: EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withValues(alpha: 0.5),
+            spreadRadius: 0,
+            blurRadius: 1,
+            offset: Offset(0.2, 0.2),
+          ),
+        ],
       ),
       child: Column(
         children: [
@@ -127,6 +136,7 @@ class _HomeScreenState extends State<HomeScreen> {
           SizedBox(height: 16),
           TaskCard(
             title: 'KEY-06Title',
+            progress: 10,
             start: '29-08-2025',
             due: '10-09-2025',
           ),
