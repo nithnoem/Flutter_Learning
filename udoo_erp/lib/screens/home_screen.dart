@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:udoo_erp/widgets/approval_card.dart';
 import 'package:udoo_erp/widgets/task_card_widget.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -8,8 +9,22 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
-  // String fullName = "guest";
+class _HomeScreenState extends State<HomeScreen>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 4, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     print("Full Name: Nit");
@@ -91,9 +106,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget get _your_work {
-    final tabs = ['Tasks', 'Approvals', 'Leave', 'KPI'];
-    final selectedIndex = 0;
-
     return Container(
       margin: EdgeInsets.only(left: 16, right: 16),
       padding: EdgeInsets.all(14),
@@ -110,38 +122,13 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          DefaultTabController(
-            length: 4,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [_menuTabs, SizedBox(height: 16), _menuContent],
-            ),
-          ),
-
-          // Row(
-          //   children: List.generate(tabs.length, (index) {
-          //     final selected = index == selectedIndex;
-          //     return Expanded(
-          //       child: Container(
-          //         padding: EdgeInsets.symmetric(vertical: 10),
-          //         decoration: BoxDecoration(
-          //           color: selected ? Colors.white : Colors.transparent,
-          //           borderRadius: BorderRadius.circular(8),
-          //         ),
-          //         alignment: Alignment.center,
-          //         child: Text(
-          //           tabs[index],
-          //           style: TextStyle(
-          //             fontWeight: FontWeight.w600,
-          //             color: selected ? Colors.orange : Colors.grey,
-          //           ),
-          //         ),
-          //       ),
-          //     );
-          //   }),
-          // ),
-          // SizedBox(height: 16),
+          _menuTabs,
+          SizedBox(height: 16),
+          _tabHeader,
+          SizedBox(height: 16),
+          _menuContent,
         ],
       ),
     );
@@ -149,6 +136,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget get _menuTabs {
     return TabBar(
+      controller: _tabController,
       isScrollable: true,
       labelColor: Colors.orange,
       unselectedLabelColor: Colors.grey,
@@ -165,23 +153,118 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Widget get _tabHeader {
+    return AnimatedBuilder(
+      animation: _tabController,
+      builder: (context, _) {
+        switch (_tabController.index) {
+          case 0:
+            return Row(
+              children: [
+                Text(
+                  'Your Task',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                ),
+                Spacer(),
+                Icon(
+                  Icons.calendar_today_outlined,
+                  size: 18,
+                  color: Colors.grey,
+                ),
+              ],
+            );
+          case 1:
+            return Row(
+              children: [
+                Text(
+                  'Pending Approvals',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+                Spacer(),
+                TextButton(
+                  onPressed: () {},
+                  child: Text(
+                    'View All',
+                    style: TextStyle(color: Colors.orange),
+                  ),
+                ),
+              ],
+            );
+          case 2:
+            return Row(
+              children: [
+                Text(
+                  'Pending Leaves',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+                Spacer(),
+                TextButton(onPressed: () {}, child: Text('View All')),
+              ],
+            );
+          case 3:
+            return Row(
+              children: [
+                Text(
+                  'KPI Overview',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+                Spacer(),
+                TextButton(onPressed: () {}, child: Text('View ALl')),
+              ],
+            );
+          default:
+            return SizedBox.shrink();
+        }
+      },
+    );
+  }
+
   Widget get _menuContent {
     return SizedBox(
       height: 400,
       child: TabBarView(
+        controller: _tabController,
         children: [
-          // _taskView
-          TaskCard(
-            title: 'KEY-06Title',
-            progress: 10,
-            start: '29-08-2025',
-            due: '10-09-2025',
-          ),
-          Center(child: Text('Approvals')),
+          _taskView,
+          _pendingApproval,
           Center(child: Text('Leave')),
           Center(child: Text('KPI')),
         ],
       ),
+    );
+  }
+
+  Widget get _taskView {
+    return ListView(
+      children: [
+        TaskCard(
+          progress: 10,
+          title: 'Test',
+          start: '2/10/2026',
+          due: '2/31/2026',
+        ),
+        SizedBox(height: 10),
+        TaskCard(
+          progress: 30,
+          title: 'Test Two',
+          start: '2/10/2026',
+          due: '2/31/2026',
+        ),
+      ],
+    );
+  }
+
+  Widget get _pendingApproval {
+    return ListView(
+      children: [
+        ApprovalCard(
+          title: 'Office Equipment Purchase',
+          type: 'Purchase Request (PR)',
+          amount: 2500,
+          date: '01-01-2026',
+          status: 'Pending',
+        ),
+      ],
     );
   }
 }
