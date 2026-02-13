@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:udoo_erp/widgets/approval_card.dart';
+import 'package:udoo_erp/widgets/leaves_card.dart';
 import 'package:udoo_erp/widgets/task_card_widget.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -227,7 +228,7 @@ class _HomeScreenState extends State<HomeScreen>
         children: [
           _taskView,
           _pendingApproval,
-          Center(child: Text('Leave')),
+          _leaveRequest,
           Center(child: Text('KPI')),
         ],
       ),
@@ -263,6 +264,21 @@ class _HomeScreenState extends State<HomeScreen>
           amount: 2500,
           date: '01-01-2026',
           status: 'Pending',
+        ),
+      ],
+    );
+  }
+
+  Widget get _leaveRequest {
+    return ListView(
+      children: [
+        LeavesCard(
+          title: 'Summer Vacation',
+          status: 'Pending',
+          type: 'Annual Leave',
+          duration: '3 days',
+          start: '13-02-2026',
+          due: '14-02-2026',
         ),
       ],
     );
