@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:udoo_erp/widgets/approval_card.dart';
+import 'package:udoo_erp/widgets/kpi_card.dart';
 import 'package:udoo_erp/widgets/leaves_card.dart';
 import 'package:udoo_erp/widgets/task_card_widget.dart';
 
@@ -225,12 +226,7 @@ class _HomeScreenState extends State<HomeScreen>
       height: 400,
       child: TabBarView(
         controller: _tabController,
-        children: [
-          _taskView,
-          _pendingApproval,
-          _leaveRequest,
-          Center(child: Text('KPI')),
-        ],
+        children: [_taskView, _pendingApproval, _leaveRequest, _kpiView],
       ),
     );
   }
@@ -279,6 +275,24 @@ class _HomeScreenState extends State<HomeScreen>
           duration: '3 days',
           start: '13-02-2026',
           due: '14-02-2026',
+        ),
+      ],
+    );
+  }
+
+  Widget get _kpiView {
+    return ListView(
+      children: [
+        KpiCard(
+          title: 'Sales Performance',
+          type: 'Monthly target',
+          average: 50,
+        ),
+        SizedBox(height: 10),
+        KpiCard(
+          title: 'Customer Satisfaction',
+          type: 'Average rating score',
+          average: 80,
         ),
       ],
     );
