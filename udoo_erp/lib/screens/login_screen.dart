@@ -10,19 +10,29 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  bool _isObsure = true;
+  bool _isObsured = true;
   bool _isValidEmail = false;
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  // @override
-  void iniState() {
-    super.initState();
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
   }
+  // // @override
+  // void iniState() {
+  //   super.initState();
+  // }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(backgroundColor: Colors.white, body: _body);
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: SafeArea(child: SingleChildScrollView(child: _body)),
+    );
   }
 
   Widget get _body {
@@ -113,31 +123,6 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       ],
     );
-    // return TextFormField(
-    //   controller: _emailController,
-    //   onChanged: (value) {
-    //     print("Value $value");
-    //     if (value.contains("@")) {
-    //       setState(() {
-    //         _isValidEmail = true;
-    //       });
-    //     }
-    //   },
-    //   validator: (value) {
-    //     if (value == null || value.isEmpty) {
-    //       return 'Please enter your email';
-    //     }
-    //     return null;
-    //   },
-    //   decoration: InputDecoration(
-    //     // prefix: Icon(Icons.attach_email),
-    //     suffix: _isValidEmail
-    //         ? Icon(Icons.check_circle, color: Colors.green)
-    //         : Icon(Icons.check_circle),
-    //     labelText: 'Email',
-    //     border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-    //   ),
-    // );
   }
 
   Widget get _password {
@@ -151,7 +136,7 @@ class _LoginScreenState extends State<LoginScreen> {
         SizedBox(height: 8),
         TextFormField(
           controller: _passwordController,
-          obscureText: _isObsure,
+          obscureText: _isObsured,
           validator: (value) {
             if (value == null || value.isEmpty) {
               return 'Please enter your password';
@@ -163,10 +148,10 @@ class _LoginScreenState extends State<LoginScreen> {
             suffixIcon: IconButton(
               onPressed: () {
                 setState(() {
-                  _isObsure = !_isObsure;
+                  _isObsured = !_isObsured;
                 });
               },
-              icon: Icon(_isObsure ? Icons.visibility_off : Icons.visibility),
+              icon: Icon(_isObsured ? Icons.visibility_off : Icons.visibility),
             ),
             contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             enabledBorder: OutlineInputBorder(
@@ -182,35 +167,13 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       ],
     );
-    // return TextFormField(
-    //   controller: _passwordController,
-    //   obscureText: _isObsure,
-    //   validator: (value) {
-    //     if (value == null || value.isEmpty) {
-    //       return 'Please enter your password';
-    //     }
-    //     return null;
-    //   },
-    //   decoration: InputDecoration(
-    //     // prefix: Icon(Icons.visibility),
-    //     labelText: 'Password',
-    //     border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-    //     suffixIcon: IconButton(
-    //       onPressed: () {
-    //         setState(() {
-    //           _isObsure = !_isObsure;
-    //         });
-    //       },
-    //       icon: Icon(Icons.visibility_off),
-    //     ),
-    //   ),
-    // );
   }
 
   Widget get _loginButton {
     return SizedBox(
       height: 50,
-      width: MediaQuery.of(context).size.width * 1,
+      width: double.infinity,
+      // width: MediaQuery.of(context).size.width * 1,
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.amber,

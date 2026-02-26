@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "452328689613",
+    "project_id": "odoo-mobile-1af60",
+    "storage_bucket": "odoo-mobile-1af60.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:452328689613:android:1e386ef0bdb306cb2bbe84",
+        "android_client_info": {
+          "package_name": "com.example.udoo_erp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBw3lypTJDCc_mOfkk-t0BJveEzm3P92TE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
