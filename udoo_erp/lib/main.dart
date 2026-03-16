@@ -1,11 +1,16 @@
 // import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:udoo_erp/screens/home_screen.dart';
-import 'package:udoo_erp/screens/login_screen.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:udoo_erp/firebase_options.dart';
+import 'package:udoo_erp/route/app_route.dart';
+
+import 'route/app_pages.dart';
+import 'route/app_route.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(App());
 }
 
@@ -15,11 +20,9 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       title: 'Mobile Integration',
-      initialRoute: '/login',
-      getPages: [
-        GetPage(name: '/login', page: () => LoginScreen()),
-        GetPage(name: '/home', page: () => HomeScreen()),
-      ],
+      debugShowCheckedModeBanner: false,
+      initialRoute: AppRoute.login,
+      getPages: AppPages.pages,
     );
   }
 }

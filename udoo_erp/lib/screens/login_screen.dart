@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:udoo_erp/screens/main_screen.dart';
 import 'package:udoo_erp/widgets/logo_widget.dart';
 import 'package:get/get.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -10,11 +12,12 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  bool _isObsured = true;
+  bool _isObscured = true;
   bool _isValidEmail = false;
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   @override
   void dispose() {
@@ -44,6 +47,7 @@ class _LoginScreenState extends State<LoginScreen> {
           _top,
           SizedBox(height: 40),
           Form(
+            key: _formKey,
             child: Column(
               children: [
                 _email,
@@ -136,7 +140,7 @@ class _LoginScreenState extends State<LoginScreen> {
         SizedBox(height: 8),
         TextFormField(
           controller: _passwordController,
-          obscureText: _isObsured,
+          obscureText: _isObscured,
           validator: (value) {
             if (value == null || value.isEmpty) {
               return 'Please enter your password';
@@ -144,14 +148,14 @@ class _LoginScreenState extends State<LoginScreen> {
             return null;
           },
           decoration: InputDecoration(
-            hintText: 'example12@',
+            hintText: '',
             suffixIcon: IconButton(
               onPressed: () {
                 setState(() {
-                  _isObsured = !_isObsured;
+                  _isObscured = !_isObscured;
                 });
               },
-              icon: Icon(_isObsured ? Icons.visibility_off : Icons.visibility),
+              icon: Icon(_isObscured ? Icons.visibility_off : Icons.visibility),
             ),
             contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             enabledBorder: OutlineInputBorder(
@@ -182,8 +186,19 @@ class _LoginScreenState extends State<LoginScreen> {
             borderRadius: BorderRadiusGeometry.circular(10),
           ),
         ),
-        onPressed: () {
-          Get.toNamed('/home');
+        onPressed: () async {
+          if (_formKey.currentState!.validate()) {
+            try {
+              await _auth.signInWithEmailAndPassword(
+                email: _emailController.text.trim(),
+                password: _passwordController.text.trim(),
+              );
+              // Get.toNamed('/home');
+              Get.offAll(() => const MainScreen());
+            } on FirebaseAuthException catch (e) {
+              Get.snackbar('Login Failed', e.message ?? 'Unknown error');
+            }
+          }
         },
         child: Text(
           'Login',
