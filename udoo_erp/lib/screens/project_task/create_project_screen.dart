@@ -14,6 +14,7 @@ class _CreateProjectScreenState extends State<CreateProjectScreen> {
 
   void createProject() {
     final project = ProjectModel(
+      id: '',
       name: nameController.text,
       shortcut: shortcutController.text,
     );

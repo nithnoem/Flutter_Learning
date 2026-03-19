@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:udoo_erp/screens/main_screen.dart';
 import 'package:udoo_erp/widgets/logo_widget.dart';
-import 'package:get/get.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -193,10 +192,14 @@ class _LoginScreenState extends State<LoginScreen> {
                 email: _emailController.text.trim(),
                 password: _passwordController.text.trim(),
               );
-              // Get.toNamed('/home');
-              Get.offAll(() => const MainScreen());
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => MainScreen()),
+              );
             } on FirebaseAuthException catch (e) {
-              Get.snackbar('Login Failed', e.message ?? 'Unknown error');
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(e.message ?? 'Login Failed')),
+              );
             }
           }
         },

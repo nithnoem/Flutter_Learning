@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:udoo_erp/route/app_route.dart';
+import 'package:udoo_erp/screens/project_task/project_task_screen.dart';
 import 'package:udoo_erp/widgets/approval_card.dart';
 import 'package:udoo_erp/widgets/kpi_card.dart';
 import 'package:udoo_erp/widgets/leaves_card.dart';
@@ -197,7 +198,10 @@ class _HomeScreenState extends State<HomeScreen>
   Widget _quickItem(IconData icon, String title, Color color, String route) {
     return GestureDetector(
       onTap: () {
-        Get.toNamed(route);
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => ProjectTaskScreen()),
+        );
       },
       child: Column(
         children: [
