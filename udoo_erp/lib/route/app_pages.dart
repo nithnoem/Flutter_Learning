@@ -2,7 +2,7 @@ import 'package:get/get.dart';
 import 'package:udoo_erp/main.dart';
 import 'package:udoo_erp/screens/login_screen.dart';
 import 'package:udoo_erp/screens/main_screen.dart';
-import 'package:udoo_erp/screens/project_task/create_project_screen.dart';
+import 'package:udoo_erp/screens/project_task/project_form_screen.dart';
 import 'package:udoo_erp/screens/project_task/project_task_screen.dart';
 import 'app_route.dart';
 
@@ -13,7 +13,7 @@ class AppPages {
     GetPage(name: AppRoute.project_task, page: () => const ProjectTaskScreen()),
     GetPage(
       name: AppRoute.create_project,
-      page: () => const CreateProjectScreen(),
+      page: () => const ProjectFormScreen(),
     ),
   ];
 }

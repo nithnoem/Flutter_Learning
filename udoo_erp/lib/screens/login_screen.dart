@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:udoo_erp/screens/main_screen.dart';
 import 'package:udoo_erp/widgets/logo_widget.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+//import 'package:firebase_auth/firebase_auth.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -16,7 +17,30 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  // final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  Future<void> login() async {
+    final supabase = Supabase.instance.client;
+
+    try {
+      final response = await supabase.auth.signInWithPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
+      if (response.user != null) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => MainScreen()),
+        );
+      }
+    } catch (e) {
+      print("Login error: $e");
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Login failed: ${e.toString()}")));
+    }
+  }
 
   @override
   void dispose() {
@@ -187,20 +211,7 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
         onPressed: () async {
           if (_formKey.currentState!.validate()) {
-            try {
-              await _auth.signInWithEmailAndPassword(
-                email: _emailController.text.trim(),
-                password: _passwordController.text.trim(),
-              );
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (_) => MainScreen()),
-              );
-            } on FirebaseAuthException catch (e) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(e.message ?? 'Login Failed')),
-              );
-            }
+            await login();
           }
         },
         child: Text(

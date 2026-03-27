@@ -1,19 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:udoo_erp/model/project_task/project_model.dart';
+import 'package:udoo_erp/provider/project_provider.dart';
+import 'package:udoo_erp/screens/project_task/project_form_screen.dart';
 
 class ProjectCardWidget extends StatelessWidget {
-  final String name;
-  final String shortcut;
+  final ProjectModel project;
 
-  const ProjectCardWidget({
-    super.key,
-    required this.name,
-    required this.shortcut,
-  });
+  const ProjectCardWidget({super.key, required this.project});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsetsGeometry.only(bottom: 12),
+      margin: EdgeInsets.only(bottom: 12),
       padding: EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -31,21 +30,29 @@ class ProjectCardWidget extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  name,
+                  project.name,
                   style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                 ),
                 SizedBox(height: 5),
-                Text(shortcut, style: TextStyle(fontSize: 12)),
+                Text(project.shortcut, style: TextStyle(fontSize: 12)),
               ],
             ),
           ),
           PopupMenuButton<String>(
-            onSelected: (value) {
+            onSelected: (value) async {
               if (value == "edit") {
-                print("Edit $name");
+                await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ProjectFormScreen(project: project),
+                  ),
+                );
               }
               if (value == "delete") {
-                print("Delete $name");
+                await Provider.of<ProjectProvider>(
+                  context,
+                  listen: false,
+                ).deleteProject(project.id!);
               }
             },
             itemBuilder: (context) => [
