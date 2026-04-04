@@ -21,8 +21,12 @@ class ProjectProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> createProject(String name, String shortcut) async {
-    await _service.createProject(name, shortcut);
+  Future<void> createProject(
+    String name,
+    String shortcut,
+    String? teamId,
+  ) async {
+    await _service.createProject(name, shortcut, teamId);
     await fetchProjects();
   }
 
@@ -31,53 +35,27 @@ class ProjectProvider extends ChangeNotifier {
     await fetchProjects();
   }
 
-  Future<void> updateProject(String id, String name, String shortcut) async {
-    await _service.updateProject(id, name, shortcut);
+  Future<void> updateProject(
+    String id,
+    String name,
+    String shortcut,
+    String? teamId,
+  ) async {
+    await _service.updateProject(id, name, shortcut, teamId);
     await fetchProjects();
   }
 
-  // Future<void> addProject(ProjectModel project) async {
-  //   final uid = FirebaseAuth.instance.currentUser!.uid;
-  //
-  //   await _firestore
-  //       .collection('users')
-  //       .doc(uid)
-  //       .collection('projects')
-  //       .add(project.toMap());
-  // }
-  //
-  // Future<void> deleteProject(String projectId) async {
-  //   final uid = FirebaseAuth.instance.currentUser!.uid;
-  //
-  //   await _firestore
-  //       .collection('users')
-  //       .doc(uid)
-  //       .collection('projects')
-  //       .doc(projectId)
-  //       .delete();
-  // }
+  Future<String> generateUniqueShortcut(String base) async {
+    String shortcut = base;
+    int counter = 1;
+    while (await _service.isShortcutExist(shortcut)) {
+      shortcut = "$base$counter";
+      counter++;
+    }
+    return shortcut;
+  }
 
-  // Future<void> updateProject(ProjectModel project) async {
-  //   final uid = FirebaseAuth.instance.currentUser!.uid;
-  //   await _firestore
-  //       .collection('users')
-  //       .doc(uid)
-  //       .collection('projects')
-  //       .doc(project.id)
-  //       .update(project.toMap());
-  // }
-
-  // Stream<List<ProjectModel>> getProjects() {
-  //   final uid = FirebaseAuth.instance.currentUser!.uid;
-  //   return _firestore
-  //       .collection('users')
-  //       .doc(uid)
-  //       .collection('projects')
-  //       .snapshots()
-  //       .map((snapshot) {
-  //         return snapshot.docs.map((doc) {
-  //           return ProjectModel.fromFirestore(doc.id, doc.data());
-  //         }).toList();
-  //       });
-  // }
+  Future<bool> isProjectNameExist(String name, String teamId) async {
+    return await _service.isProjectNameExist(name, teamId);
+  }
 }

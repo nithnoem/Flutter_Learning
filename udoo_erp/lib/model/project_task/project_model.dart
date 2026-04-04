@@ -3,12 +3,14 @@ class ProjectModel {
   final String name;
   final String shortcut;
   final String userId;
+  final String? teamId;
 
   ProjectModel({
     required this.id,
     required this.name,
     required this.shortcut,
     required this.userId,
+    this.teamId,
   });
 
   // convert model to firebase
@@ -22,12 +24,18 @@ class ProjectModel {
       id: json['id'].toString(),
       name: json['name'] ?? "",
       shortcut: json['shortcut'] ?? "",
-      userId: json['userId'] ?? "",
+      userId: json['user_id'] ?? "",
+      teamId: json['team_id'].toString(),
     );
   }
 
   Map<String, dynamic> toJson() {
-    return {'name': name, 'shortcut': shortcut, 'userId': userId};
+    return {
+      'name': name,
+      'shortcut': shortcut,
+      'userId': userId,
+      'teamId': teamId,
+    };
   }
 
   // factory ProjectModel.fromFirestore(String id, Map<String, dynamic> data) {
