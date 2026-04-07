@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:udoo_erp/screens/main_screen.dart';
 import 'package:udoo_erp/widgets/logo_widget.dart';
-import 'package:get/get.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+//import 'package:firebase_auth/firebase_auth.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -10,11 +12,35 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  bool _isObsured = true;
+  bool _isObscured = true;
   bool _isValidEmail = false;
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  // final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  Future<void> login() async {
+    final supabase = Supabase.instance.client;
+
+    try {
+      final response = await supabase.auth.signInWithPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
+      if (response.user != null) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => MainScreen()),
+        );
+      }
+    } catch (e) {
+      print("Login error: $e");
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Login failed: ${e.toString()}")));
+    }
+  }
 
   @override
   void dispose() {
@@ -44,6 +70,7 @@ class _LoginScreenState extends State<LoginScreen> {
           _top,
           SizedBox(height: 40),
           Form(
+            key: _formKey,
             child: Column(
               children: [
                 _email,
@@ -136,7 +163,7 @@ class _LoginScreenState extends State<LoginScreen> {
         SizedBox(height: 8),
         TextFormField(
           controller: _passwordController,
-          obscureText: _isObsured,
+          obscureText: _isObscured,
           validator: (value) {
             if (value == null || value.isEmpty) {
               return 'Please enter your password';
@@ -144,14 +171,14 @@ class _LoginScreenState extends State<LoginScreen> {
             return null;
           },
           decoration: InputDecoration(
-            hintText: 'example12@',
+            hintText: '',
             suffixIcon: IconButton(
               onPressed: () {
                 setState(() {
-                  _isObsured = !_isObsured;
+                  _isObscured = !_isObscured;
                 });
               },
-              icon: Icon(_isObsured ? Icons.visibility_off : Icons.visibility),
+              icon: Icon(_isObscured ? Icons.visibility_off : Icons.visibility),
             ),
             contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             enabledBorder: OutlineInputBorder(
@@ -182,8 +209,10 @@ class _LoginScreenState extends State<LoginScreen> {
             borderRadius: BorderRadiusGeometry.circular(10),
           ),
         ),
-        onPressed: () {
-          Get.toNamed('/home');
+        onPressed: () async {
+          if (_formKey.currentState!.validate()) {
+            await login();
+          }
         },
         child: Text(
           'Login',

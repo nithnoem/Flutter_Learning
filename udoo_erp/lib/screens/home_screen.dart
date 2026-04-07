@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:udoo_erp/route/app_route.dart';
+import 'package:udoo_erp/screens/project_task/project_task_screen.dart';
 import 'package:udoo_erp/widgets/approval_card.dart';
 import 'package:udoo_erp/widgets/kpi_card.dart';
 import 'package:udoo_erp/widgets/leaves_card.dart';
@@ -29,20 +32,26 @@ class _HomeScreenState extends State<HomeScreen>
 
   @override
   Widget build(BuildContext context) {
-    print("Full Name: Nit");
-    return Scaffold(
-      backgroundColor: Colors.grey.shade200,
-      appBar: _appBar,
-      body: Container(
-        color: Colors.grey.shade50,
-        child: ListView(
-          children: [
-            _wel_msg,
-            SizedBox(height: 16),
-            _your_work,
-            // _quick_access,
-          ],
-        ),
+    return Container(
+      color: Colors.grey.shade200,
+      child: Column(
+        children: [
+          _appBar,
+          Expanded(
+            child: Container(
+              color: Colors.grey.shade50,
+              child: ListView(
+                children: [
+                  _wel_msg,
+                  SizedBox(height: 16),
+                  _your_work,
+                  SizedBox(height: 20),
+                  _quickAccess,
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -136,10 +145,93 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
+  Widget get _quickAccess {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Quick Access',
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
+          SizedBox(height: 16),
+          GridView.count(
+            crossAxisCount: 4,
+            shrinkWrap: true,
+            physics: NeverScrollableScrollPhysics(),
+            crossAxisSpacing: 10,
+            mainAxisSpacing: 10,
+            childAspectRatio: 0.75,
+            children: [
+              _quickItem(
+                Icons.checklist,
+                'Project Task',
+                Colors.orange,
+                AppRoute.project_task,
+              ),
+              _quickItem(
+                Icons.verified,
+                'Approval Request',
+                Colors.blue,
+                AppRoute.project_task,
+              ),
+              _quickItem(
+                Icons.calendar_today,
+                'Leave',
+                Colors.red,
+                AppRoute.project_task,
+              ),
+              _quickItem(
+                Icons.bar_chart,
+                'KPT',
+                Colors.green,
+                AppRoute.project_task,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _quickItem(IconData icon, String title, Color color, String route) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => ProjectTaskScreen()),
+        );
+      },
+      child: Column(
+        children: [
+          Container(
+            width: 60,
+            height: 60,
+            decoration: BoxDecoration(
+              color: color,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(icon, color: Colors.white, size: 30),
+          ),
+          SizedBox(height: 6),
+          SizedBox(
+            width: 70,
+            child: Text(
+              title,
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 12),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget get _menuTabs {
     return TabBar(
       controller: _tabController,
-      isScrollable: true,
+      isScrollable: false,
       labelColor: Colors.orange,
       unselectedLabelColor: Colors.grey,
       indicatorColor: Colors.orange,
@@ -223,7 +315,7 @@ class _HomeScreenState extends State<HomeScreen>
 
   Widget get _menuContent {
     return SizedBox(
-      height: 400,
+      height: 200,
       child: TabBarView(
         controller: _tabController,
         children: [_taskView, _pendingApproval, _leaveRequest, _kpiView],
@@ -233,6 +325,7 @@ class _HomeScreenState extends State<HomeScreen>
 
   Widget get _taskView {
     return ListView(
+      physics: BouncingScrollPhysics(),
       children: [
         TaskCard(
           progress: 10,
@@ -253,6 +346,7 @@ class _HomeScreenState extends State<HomeScreen>
 
   Widget get _pendingApproval {
     return ListView(
+      physics: BouncingScrollPhysics(),
       children: [
         ApprovalCard(
           title: 'Office Equipment Purchase',
@@ -267,6 +361,7 @@ class _HomeScreenState extends State<HomeScreen>
 
   Widget get _leaveRequest {
     return ListView(
+      physics: BouncingScrollPhysics(),
       children: [
         LeavesCard(
           title: 'Summer Vacation',
@@ -282,6 +377,7 @@ class _HomeScreenState extends State<HomeScreen>
 
   Widget get _kpiView {
     return ListView(
+      physics: BouncingScrollPhysics(),
       children: [
         KpiCard(
           title: 'Sales Performance',
