@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:udoo_erp/screens/project_task/project_task_screen.dart';
 import 'home_screen.dart';
 
 class MainScreen extends StatefulWidget {
@@ -21,7 +22,7 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _pages[_index],
+      body: IndexedStack(index: _index, children: _pages),
 
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _index,

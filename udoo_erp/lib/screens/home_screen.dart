@@ -198,7 +198,7 @@ class _HomeScreenState extends State<HomeScreen>
   Widget _quickItem(IconData icon, String title, Color color, String route) {
     return GestureDetector(
       onTap: () {
-        Navigator.pushReplacement(
+        Navigator.push(
           context,
           MaterialPageRoute(builder: (_) => ProjectTaskScreen()),
         );
