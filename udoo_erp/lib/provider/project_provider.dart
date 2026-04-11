@@ -45,6 +45,13 @@ class ProjectProvider extends ChangeNotifier {
     await fetchProjects();
   }
 
+  Future<void> createNotificationForTeam({
+    required String teamId,
+    required String projectName,
+  }) async {
+    await _service.createNotificationForTeam(teamId, projectName);
+  }
+
   Future<String> generateUniqueShortcut(String base) async {
     String shortcut = base;
     int counter = 1;

@@ -83,6 +83,11 @@ class _ProjectFormScreenState extends State<ProjectFormScreen> {
           shortcut,
           selectedTeamId!,
         );
+
+        await provider.createNotificationForTeam(
+          teamId: selectedTeamId!,
+          projectName: nameController.text,
+        );
       }
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(isEdit ? 'Project updated' : 'Project created')),

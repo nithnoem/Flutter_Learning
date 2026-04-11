@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:udoo_erp/screens/project_task/project_task_screen.dart';
 import 'home_screen.dart';
+import 'notifications_screen.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -14,9 +15,9 @@ class _MainScreenState extends State<MainScreen> {
 
   final List<Widget> _pages = [
     const HomeScreen(),
-    Center(child: Text('Chat')),
-    Center(child: Text('Notification')),
-    Center(child: Text('Profile')),
+    const Center(child: Text('Chat')),
+    const NotificationsScreen(),
+    const Center(child: Text('Profile')),
   ];
 
   @override

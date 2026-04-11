@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:udoo_erp/provider/notifications_provider.dart';
 import 'package:udoo_erp/provider/project_provider.dart';
 import 'package:udoo_erp/provider/team_provider.dart';
 import 'package:udoo_erp/screens/login_screen.dart';
@@ -18,6 +19,7 @@ void main() async {
       providers: [
         ChangeNotifierProvider(create: (_) => ProjectProvider()),
         ChangeNotifierProvider(create: (_) => TeamProvider()),
+        ChangeNotifierProvider(create: (_) => NotificationsProvider()),
       ],
 
       child: App(),

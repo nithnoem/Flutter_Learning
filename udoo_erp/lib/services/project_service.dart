@@ -64,4 +64,17 @@ class ProjectService {
         .ilike('name', name.trim());
     return data.isNotEmpty;
   }
+
+  Future<void> createNotificationForTeam(
+    String teamId,
+    String projectName,
+  ) async {
+    await supabase.from('notifications').insert({
+      'team_id': teamId,
+      'title': 'New Project Assigned',
+      'body': 'Project "$projectName" assigned to your team',
+      'type': 'project',
+      'is_read': false,
+    });
+  }
 }
