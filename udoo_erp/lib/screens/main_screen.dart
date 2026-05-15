@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+// import 'package:udoo_erp/provider/notifications_provider.dart';
 import 'package:udoo_erp/screens/project_task/project_task_screen.dart';
 import 'home_screen.dart';
 import 'notifications_screen.dart';
@@ -34,6 +36,10 @@ class _MainScreenState extends State<MainScreen> {
           setState(() {
             _index = value;
           });
+          // if (value == 2) {
+          //   final provider = context.read<NotificationsProvider>();
+          //   provider.fetchNotification();
+          // }
         },
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),

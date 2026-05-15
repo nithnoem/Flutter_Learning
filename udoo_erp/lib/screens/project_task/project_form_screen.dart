@@ -1,10 +1,9 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:udoo_erp/model/project_task/project_model.dart';
 import 'package:udoo_erp/provider/project_provider.dart';
 import 'package:udoo_erp/provider/team_provider.dart';
+import 'package:udoo_erp/provider/auth_provider.dart';
 
 class ProjectFormScreen extends StatefulWidget {
   final ProjectModel? project;
@@ -17,15 +16,14 @@ class ProjectFormScreen extends StatefulWidget {
 class _ProjectFormScreenState extends State<ProjectFormScreen> {
   final _formKey = GlobalKey<FormState>();
   late TextEditingController nameController = TextEditingController();
-  late TextEditingController shortcutController = TextEditingController();
-  String? selectedTeamId;
+  dynamic selectedTeamId;
   String? nameError;
-
-  bool get isEdit => widget.project != null;
   bool isManualEdit = false;
+  bool get isEdit => widget.project != null;
+
   String generateShortcut(String name) {
     return name
-        // .trim()
+        .trim()
         .split(' ')
         .where((word) => word.isNotEmpty)
         .map((word) => word[0].toUpperCase())
@@ -37,62 +35,60 @@ class _ProjectFormScreenState extends State<ProjectFormScreen> {
     super.initState();
 
     nameController = TextEditingController(text: widget.project?.name ?? "");
-    shortcutController = TextEditingController(
-      text: widget.project?.shortcut ?? "",
-    );
     selectedTeamId = widget.project?.teamId;
 
     Future.microtask(() {
-      Provider.of<TeamProvider>(context, listen: false).fetchTeams();
+      final auth = Provider.of<AuthProvider>(context, listen: false);
+      final token = auth.token;
+
+      if (token != null) {
+        Provider.of<TeamProvider>(context, listen: false).fetchTeams(token);
+      }
     });
   }
 
+  @override
+  void dispose() {
+    nameController.dispose();
+    super.dispose();
+  }
+
   void submit() async {
-    if (!_formKey.currentState!.validate()) {
+    if (!_formKey.currentState!.validate()) return;
+    final projectProvider = Provider.of<ProjectProvider>(
+      context,
+      listen: false,
+    );
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final activedId = authProvider.userId;
+    final token = authProvider.token;
+
+    if (activedId == null || token == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Error: User not authenticated")),
+      );
       return;
     }
-    final provider = Provider.of<ProjectProvider>(context, listen: false);
     try {
-      final exists = await provider.isProjectNameExist(
-        nameController.text,
-        selectedTeamId!,
-      );
-      if (exists && !isEdit) {
-        setState(() {
-          nameError = "Project already exists in this team";
-        });
-        return;
-      }
-      String shortcut = shortcutController.text;
-
-      if (shortcut.isEmpty) {
-        shortcut = generateShortcut(nameController.text);
-      }
-
-      shortcut = await provider.generateUniqueShortcut(shortcut);
       if (isEdit) {
-        await provider.updateProject(
+        await projectProvider.updateProject(
           widget.project!.id,
           nameController.text,
-          shortcut,
           selectedTeamId,
+          token,
         );
       } else {
-        await provider.createProject(
+        //pass active user id
+        await projectProvider.createProject(
           nameController.text,
-          shortcut,
-          selectedTeamId!,
-        );
-
-        await provider.createNotificationForTeam(
-          teamId: selectedTeamId!,
-          projectName: nameController.text,
+          selectedTeamId,
+          activedId,
+          token,
         );
       }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(isEdit ? 'Project updated' : 'Project created')),
-      );
-      Navigator.pop(context);
+      if (mounted) {
+        Navigator.pop(context);
+      }
     } catch (e) {
       ScaffoldMessenger.of(
         context,
@@ -118,25 +114,11 @@ class _ProjectFormScreenState extends State<ProjectFormScreen> {
                   errorText: nameError,
                 ),
                 onChanged: (value) {
-                  if (!isManualEdit) {
-                    shortcutController.text = generateShortcut(value);
-                  }
                   setState(() {
                     nameError = null;
                   });
                 },
               ),
-
-              const SizedBox(height: 20),
-
-              TextFormField(
-                controller: shortcutController,
-                decoration: const InputDecoration(labelText: "Shortcut"),
-                onChanged: (value) {
-                  isManualEdit = true;
-                },
-              ),
-
               SizedBox(height: 20),
               Consumer<TeamProvider>(
                 builder: (context, teamProvider, child) {
@@ -161,7 +143,7 @@ class _ProjectFormScreenState extends State<ProjectFormScreen> {
                       });
                     },
                     validator: (value) {
-                      if (value == null || value.isEmpty) {
+                      if (value == null) {
                         return "Please select a team";
                       }
                       return null;

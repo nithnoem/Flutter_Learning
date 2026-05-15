@@ -1,3 +1,5 @@
+// import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:udoo_erp/model/notifications_model.dart';
 import 'package:udoo_erp/services/notifications_service.dart';
@@ -8,13 +10,13 @@ class NotificationsProvider extends ChangeNotifier {
   List<NotificationsModel> notifications = [];
   bool isLoading = false;
 
-  Future<void> fetchNotification() async {
+  Future<void> fetchNotification(String token) async {
     isLoading = true;
     notifyListeners();
 
     try {
-      final data = await _service.fetchNotifications();
-      notifications = data.map((e) => NotificationsModel.fromJson(e)).toList();
+      final data = await _service.fetchNotifications(token);
+      notifications = data;
     } catch (e) {
       debugPrint("Notification error: $e");
     }
@@ -22,23 +24,17 @@ class NotificationsProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> markAsRead(String id) async {
-    await _service.markAsRead(id);
+  Future<void> markAsRead(String token, String uuid) async {
+    try {
+      await _service.markAsRead(token, uuid);
 
-    final index = notifications.indexWhere((n) => n.id == id);
-    if (index != -1) {
-      notifications[index] = NotificationsModel(
-        id: notifications[index].id,
-        userId: notifications[index].userId,
-        title: notifications[index].title,
-        body: notifications[index].body,
-        type: notifications[index].type,
-        isRead: notifications[index].isRead,
-        createdAt: notifications[index].createdAt,
-      );
+      int index = notifications.indexWhere((n) => n.id == uuid);
+      if (index != -1) {
+        notifications[index].isReadLocal = true;
+        notifyListeners();
+      }
+    } catch (e) {
+      debugPrint("Mark as read error: $e");
     }
-    notifyListeners();
   }
-
-  int get unreadCount => notifications.where((n) => !n.isRead).length;
 }

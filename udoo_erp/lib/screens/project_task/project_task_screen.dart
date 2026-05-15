@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:udoo_erp/model/project_task/project_model.dart';
+import 'package:udoo_erp/provider/auth_provider.dart';
 import 'package:udoo_erp/provider/project_provider.dart';
 import 'package:udoo_erp/screens/project_task/project_form_screen.dart';
 import 'package:udoo_erp/widgets/project_task/project_card_widget.dart';
@@ -16,8 +17,12 @@ class _ProjectTaskScreenState extends State<ProjectTaskScreen> {
   @override
   void initState() {
     super.initState();
+    final auth = Provider.of<AuthProvider>(context, listen: false);
     Future.microtask(() {
-      Provider.of<ProjectProvider>(context, listen: false).fetchProjects();
+      Provider.of<ProjectProvider>(
+        context,
+        listen: false,
+      ).fetchProjects(auth.token!);
     });
   }
 
@@ -25,58 +30,31 @@ class _ProjectTaskScreenState extends State<ProjectTaskScreen> {
   Widget build(BuildContext context) {
     // final projectProvider = Provider.of<ProjectProvider>(context);
     final projectProvider = context.watch<ProjectProvider>();
+    final authProvider = context.watch<AuthProvider>();
     final projects = projectProvider.projects;
     return Scaffold(
       appBar: _appBar(context),
       body: projectProvider.isLoading
           ? Center(child: CircularProgressIndicator())
-          : ListView(
-              padding: EdgeInsets.all(16),
-              children: [
-                _searchBar,
-                SizedBox(height: 20),
-                _sectionTitle("All Projects"),
-                SizedBox(height: 10),
-                if (projects.isEmpty)
-                  Center(child: Text("No projects found!"))
-                else
-                  ...projects
-                      .map((project) => ProjectCardWidget(project: project))
-                      .toList(),
-              ],
+          : RefreshIndicator(
+              onRefresh: () =>
+                  projectProvider.fetchProjects(authProvider.token!),
+              child: ListView(
+                padding: EdgeInsets.all(16),
+                children: [
+                  _searchBar,
+                  SizedBox(height: 20),
+                  _sectionTitle("All Projects"),
+                  SizedBox(height: 10),
+                  if (projects.isEmpty)
+                    Center(child: Text("No projects found!"))
+                  else
+                    ...projects
+                        .map((project) => ProjectCardWidget(project: project))
+                        .toList(),
+                ],
+              ),
             ),
-      // body: StreamBuilder<List<ProjectModel>>(
-      //   stream: projectProvider.getProjects(),
-      //   builder: (context, snapshot) {
-      //     if (!snapshot.hasData) {
-      //       return Center(child: CircularProgressIndicator());
-      //     }
-      //     final projects = snapshot.data!;
-      //
-      //     return ListView(
-      //       padding: EdgeInsets.all(16),
-      //       children: [
-      //         _searchBar,
-      //         SizedBox(height: 20),
-      //         _sectionTitle("All Projects"),
-      //         SizedBox(height: 10),
-      //         if (projects.isEmpty)
-      //           const Padding(
-      //             padding: EdgeInsetsGeometry.symmetric(vertical: 32),
-      //             child: Center(child: Text('No project yet!')),
-      //           )
-      //         else
-      //           ...projects
-      //               .map((project) => ProjectCardWidget(project: project))
-      //               .toList(),
-      //
-      //         // ...projects.map((project) {
-      //         //   return ProjectCardWidget(project: project);
-      //         // }),
-      //       ],
-      //     );
-      //   },
-      // ),
     );
   }
 

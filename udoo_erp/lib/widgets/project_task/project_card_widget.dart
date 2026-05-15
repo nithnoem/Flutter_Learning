@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:udoo_erp/model/project_task/project_model.dart';
+import 'package:udoo_erp/provider/auth_provider.dart';
 import 'package:udoo_erp/provider/project_provider.dart';
 import 'package:udoo_erp/screens/project_task/project_form_screen.dart';
 
@@ -18,12 +19,26 @@ class ProjectCardWidget extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
-          BoxShadow(color: Colors.grey.withValues(alpha: 0.2), blurRadius: 3),
+          BoxShadow(
+            color: Colors.grey.withValues(alpha: 0.2),
+            blurRadius: 3,
+            offset: Offset(0, 2),
+          ),
         ],
       ),
       child: Row(
         children: [
-          Image.asset('assets/images/erp.png', width: 40),
+          Image.asset(
+            'assets/images/erp.png',
+            width: 40,
+            errorBuilder: (context, error, stackTrace) {
+              return Icon(
+                Icons.business_center,
+                size: 40,
+                color: Colors.blueGrey,
+              );
+            },
+          ),
           SizedBox(width: 10),
           Expanded(
             child: Column(
@@ -34,7 +49,7 @@ class ProjectCardWidget extends StatelessWidget {
                   style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                 ),
                 SizedBox(height: 5),
-                Text(project.shortcut, style: TextStyle(fontSize: 12)),
+                Text(project.shortcut ?? "NA", style: TextStyle(fontSize: 12)),
               ],
             ),
           ),
@@ -49,10 +64,14 @@ class ProjectCardWidget extends StatelessWidget {
                 );
               }
               if (value == "delete") {
+                final token = Provider.of<AuthProvider>(
+                  context,
+                  listen: false,
+                ).token;
                 await Provider.of<ProjectProvider>(
                   context,
                   listen: false,
-                ).deleteProject(project.id!);
+                ).deleteProject(project.id, token!);
               }
             },
             itemBuilder: (context) => [

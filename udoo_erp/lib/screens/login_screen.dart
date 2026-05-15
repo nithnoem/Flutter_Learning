@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:udoo_erp/provider/auth_provider.dart';
 import 'package:udoo_erp/screens/main_screen.dart';
 import 'package:udoo_erp/widgets/logo_widget.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-//import 'package:firebase_auth/firebase_auth.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -17,28 +17,32 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  // final FirebaseAuth _auth = FirebaseAuth.instance;
+  String? _loginError;
 
   Future<void> login() async {
-    final supabase = Supabase.instance.client;
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
 
     try {
-      final response = await supabase.auth.signInWithPassword(
-        email: _emailController.text.trim(),
-        password: _passwordController.text.trim(),
+      final success = await authProvider.login(
+        _emailController.text.trim(),
+        _passwordController.text.trim(),
       );
-      if (response.user != null) {
+      if (success) {
+        if (!mounted) return;
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (_) => MainScreen()),
+          MaterialPageRoute(builder: (_) => const MainScreen()),
         );
+      } else {
+        if (!mounted) return;
+        setState(() {
+          _loginError = "Invalid email or password";
+        });
       }
     } catch (e) {
-      print("Login error: $e");
-
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("Login failed: ${e.toString()}")));
+      setState(() {
+        _loginError = "Connection error. Please try again.";
+      });
     }
   }
 
@@ -48,10 +52,6 @@ class _LoginScreenState extends State<LoginScreen> {
     _passwordController.dispose();
     super.dispose();
   }
-  // // @override
-  // void iniState() {
-  //   super.initState();
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -116,23 +116,26 @@ class _LoginScreenState extends State<LoginScreen> {
         SizedBox(height: 8),
         TextFormField(
           controller: _emailController,
+          autovalidateMode: AutovalidateMode.onUserInteraction,
           keyboardType: TextInputType.emailAddress,
           onChanged: (value) {
             setState(() {
-              _isValidEmail = value.contains('@');
+              _isValidEmail = value.contains('@') && value.contains('.com');
+              _loginError = null;
             });
           },
           validator: (value) {
             if (value == null || value.isEmpty) {
               return 'Please enter your email';
             }
-            if (!value.contains('@')) {
+            if (!value.contains('@') || !value.contains('.com')) {
               return 'Invalid email format';
             }
             return null;
           },
           decoration: InputDecoration(
-            hintText: 'name12@gmail.com',
+            hintText: 'name@gmail.com',
+            errorText: _loginError,
             suffixIcon: _isValidEmail
                 ? Icon(Icons.check_circle, color: Colors.green)
                 : null,
@@ -145,7 +148,14 @@ class _LoginScreenState extends State<LoginScreen> {
               borderRadius: BorderRadius.circular(10),
               borderSide: BorderSide(color: Colors.blue),
             ),
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide(color: Colors.red.shade400),
+            ),
+            focusedErrorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide(color: Colors.red, width: 2),
+            ),
           ),
         ),
       ],
@@ -210,7 +220,9 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         ),
         onPressed: () async {
+          print("Login Button Pressed!");
           if (_formKey.currentState!.validate()) {
+            print("From is valid, sending request...");
             await login();
           }
         },

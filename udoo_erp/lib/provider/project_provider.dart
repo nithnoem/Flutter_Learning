@@ -8,12 +8,11 @@ class ProjectProvider extends ChangeNotifier {
   List<ProjectModel> projects = [];
   bool isLoading = false;
 
-  Future<void> fetchProjects() async {
+  Future<void> fetchProjects(String token) async {
     isLoading = true;
     notifyListeners();
     try {
-      final data = await _service.getProjects();
-      projects = data.map((map) => ProjectModel.fromJson(map)).toList();
+      projects = await _service.getProjects(token);
     } catch (e) {
       debugPrint('API fetch Error: $e');
     }
@@ -23,46 +22,30 @@ class ProjectProvider extends ChangeNotifier {
 
   Future<void> createProject(
     String name,
-    String shortcut,
-    String? teamId,
+    int? teamId,
+    int userId,
+    String token,
   ) async {
-    await _service.createProject(name, shortcut, teamId);
-    await fetchProjects();
+    await _service.createProject(name, teamId, userId, token);
+    await fetchProjects(token);
   }
 
-  Future<void> deleteProject(String id) async {
-    await _service.deleteProject(id);
-    await fetchProjects();
+  Future<void> deleteProject(int id, String token) async {
+    await _service.deleteProject(id, token);
+    await fetchProjects(token);
   }
 
   Future<void> updateProject(
-    String id,
+    int id,
     String name,
-    String shortcut,
-    String? teamId,
+    int? teamId,
+    String token,
   ) async {
-    await _service.updateProject(id, name, shortcut, teamId);
-    await fetchProjects();
-  }
-
-  Future<void> createNotificationForTeam({
-    required String teamId,
-    required String projectName,
-  }) async {
-    await _service.createNotificationForTeam(teamId, projectName);
-  }
-
-  Future<String> generateUniqueShortcut(String base) async {
-    String shortcut = base;
-    int counter = 1;
-    while (await _service.isShortcutExist(shortcut)) {
-      shortcut = "$base$counter";
-      counter++;
-    }
-    return shortcut;
+    await _service.updateProject(id, name, teamId, token);
+    await fetchProjects(token);
   }
 
   Future<bool> isProjectNameExist(String name, String teamId) async {
-    return await _service.isProjectNameExist(name, teamId);
+    return false;
   }
 }

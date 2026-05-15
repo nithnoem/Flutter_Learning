@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:udoo_erp/model/project_task/team_model.dart';
 import 'package:udoo_erp/services/team_service.dart';
@@ -8,13 +10,13 @@ class TeamProvider extends ChangeNotifier {
   List<TeamModel> teams = [];
   bool isLoading = false;
 
-  Future<void> fetchTeams() async {
+  Future<void> fetchTeams(String token) async {
     isLoading = true;
     notifyListeners();
 
     try {
-      final data = await _service.getTeams();
-      teams = data.map((e) => TeamModel.fromJson(e)).toList();
+      final List<dynamic> data = await _service.getTeams(token);
+      teams = data.map((json) => TeamModel.fromJson(json)).toList();
     } catch (e) {
       debugPrint("Team fetch error: $e");
     }

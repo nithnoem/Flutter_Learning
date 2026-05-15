@@ -1,80 +1,74 @@
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:udoo_erp/model/project_task/project_model.dart';
 
 class ProjectService {
-  final supabase = Supabase.instance.client;
+  static const String baseUrl = 'http://127.0.0.1:8000/api';
 
-  Future<List<Map<String, dynamic>>> getProjects() async {
-    final user = supabase.auth.currentUser;
-    print("User Id: ${user?.id}");
-    if (user == null) {
-      throw Exception("User not logged in!");
+  Map<String, String> _getAuthHeaders(String token) => {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+    'Authorization': 'Bearer $token',
+  };
+
+  Future<List<ProjectModel>> getProjects(String token) async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/projects'),
+        headers: _getAuthHeaders(token),
+      );
+      if (response.statusCode == 200) {
+        final List data = jsonDecode(response.body);
+        return data.map((item) => ProjectModel.fromJson(item)).toList();
+      } else {
+        throw Exception("Failed to load projects: ${response.body}");
+      }
+    } catch (e) {
+      print("Error in getProjects: $e");
+      rethrow;
     }
-    final data = await supabase.from('projects').select();
-    // .eq('user_id', user.id);
-    return List<Map<String, dynamic>>.from(data);
   }
 
   Future<void> createProject(
     String name,
-    String shortcut,
-    String? teamId,
+    int? teamId,
+    int userId,
+    String token,
   ) async {
-    final user = supabase.auth.currentUser;
-    if (user == null) {
-      throw Exception("User not logged in!");
+    final response = await http.post(
+      Uri.parse('$baseUrl/projects'),
+      headers: _getAuthHeaders(token),
+      body: jsonEncode({'name': name, 'team_id': teamId, 'user_id': userId}),
+    );
+    if (response.statusCode != 201) {
+      throw Exception("Failed to create project");
     }
-    await supabase.from('projects').insert({
-      'name': name,
-      'shortcut': shortcut,
-      'user_id': user.id,
-      'team_id': teamId,
-    });
   }
 
   Future<void> updateProject(
-    String id,
+    int id,
     String name,
-    String shortcut,
-    String? teamId,
+    int? teamId,
+
+    String token,
   ) async {
-    await supabase
-        .from('projects')
-        .update({'name': name, 'shortcut': shortcut})
-        .eq('id', id);
+    final response = await http.put(
+      Uri.parse('$baseUrl/projects/$id'),
+      headers: _getAuthHeaders(token),
+      body: jsonEncode({'name': name, 'team_id': teamId}),
+    );
+    if (response.statusCode != 200) {
+      throw Exception("Failed to update project: ${response.body}");
+    }
   }
 
-  Future<void> deleteProject(String id) async {
-    await supabase.from('projects').delete().eq('id', id);
-  }
-
-  Future<bool> isShortcutExist(String shortcut) async {
-    final data = await supabase
-        .from('projects')
-        .select()
-        .eq('shortcut', shortcut);
-    return data.isNotEmpty;
-  }
-
-  Future<bool> isProjectNameExist(String name, String teamId) async {
-    final data = await supabase
-        .from('projects')
-        .select()
-        .eq('team_id', teamId)
-        .ilike('name', name.trim());
-    return data.isNotEmpty;
-  }
-
-  Future<void> createNotificationForTeam(
-    String teamId,
-    String projectName,
-  ) async {
-    await supabase.from('notifications').insert({
-      'team_id': teamId,
-      'title': 'New Project Assigned',
-      'body': 'Project "$projectName" assigned to your team',
-      'type': 'project',
-      'is_read': false,
-    });
+  Future<void> deleteProject(int id, String token) async {
+    final response = await http.delete(
+      Uri.parse('$baseUrl/projects/$id'),
+      headers: _getAuthHeaders(token),
+    );
+    if (response.statusCode != 200) {
+      throw Exception("Failed to delete project");
+    }
   }
 }
