@@ -8,6 +8,7 @@ class TeamProvider extends ChangeNotifier {
   final TeamService _service = TeamService();
 
   List<TeamModel> teams = [];
+  List<dynamic> teamMembers = [];
   bool isLoading = false;
 
   Future<void> fetchTeams(String token) async {
@@ -19,6 +20,18 @@ class TeamProvider extends ChangeNotifier {
       teams = data.map((json) => TeamModel.fromJson(json)).toList();
     } catch (e) {
       debugPrint("Team fetch error: $e");
+    }
+    isLoading = false;
+    notifyListeners();
+  }
+
+  Future<void> fetchTeamMembers(int teamId, String token) async {
+    isLoading = true;
+    notifyListeners();
+    try {
+      teamMembers = await _service.getTeamMembers(teamId, token);
+    } catch (error) {
+      debugPrint("Error fetching team memebers: $error");
     }
     isLoading = false;
     notifyListeners();
